@@ -55,18 +55,37 @@ def get_conversation(conversation):
 
 
 @frappe.whitelist(methods=["POST"])
-def send_text(conversation, message):
+def send_text(conversation, message=None, attach=None, content_type="text", template=None):
     require_roles(ROLES)
     conv = _conversation(conversation)
     message = (message or "").strip()
-    if not message:
-        frappe.throw(_("Message is required"))
+    if not message and not attach and not template:
+        frappe.throw(_("Message, attachment, or template is required"))
     phone = normalize_phone(conv.phone_number)
     settings = frappe.get_single("WhatsApp Settings")
     consent = frappe.db.get_value("WhatsApp Consent", {"phone_number": phone, "whatsapp_account": conv.whatsapp_account}, "status")
     if settings.require_opt_in and consent != "Opted In":
         frappe.throw(_("Recipient has not opted in to WhatsApp messages."))
-    doc = frappe.get_doc({"doctype": "WhatsApp Message", "type": "Outgoing", "to": phone, "content_type": "text", "message_type": "Manual", "message": message, "profile_name": conv.customer_name, "whatsapp_account": conv.whatsapp_account, "conversation": conv.name})
+
+    doc_args = {
+        "doctype": "WhatsApp Message",
+        "type": "Outgoing",
+        "to": phone,
+        "content_type": content_type,
+        "message_type": "Template" if template else "Manual",
+        "message": message,
+        "profile_name": conv.customer_name,
+        "whatsapp_account": conv.whatsapp_account,
+        "conversation": conv.name
+    }
+
+    if attach:
+        doc_args["attach"] = attach
+
+    if template:
+        doc_args["template"] = template
+
+    doc = frappe.get_doc(doc_args)
     doc.insert(ignore_permissions=True)
     conv.last_message = message
     conv.last_message_at = now_datetime()
