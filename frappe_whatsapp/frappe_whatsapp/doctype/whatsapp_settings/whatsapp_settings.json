@@ -1,0 +1,350 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-10-27 17:51:09.426813",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "accounts_section",
+  "default_incoming_account",
+  "column_break_accounts",
+  "default_outgoing_account",
+  "inbox_section",
+  "enable_command_center",
+  "enable_unified_inbox",
+  "enable_agent_assignment",
+  "enable_teams",
+  "column_break_inbox",
+  "default_agent",
+  "auto_assign_strategy",
+  "conversation_close_after_hours",
+  "sla_minutes",
+  "crm_section",
+  "enable_crm_linking",
+  "enable_issue_creation",
+  "enable_opportunity_creation",
+  "enable_document_sharing",
+  "column_break_crm",
+  "phone_match_field",
+  "default_issue_type",
+  "default_support_team",
+  "campaign_section",
+  "enable_campaigns",
+  "require_opt_in",
+  "enable_quiet_hours",
+  "quiet_hours_start",
+  "quiet_hours_end",
+  "column_break_campaign",
+  "campaign_batch_size",
+  "campaign_rate_per_minute",
+  "stop_keywords",
+  "automation_section",
+  "enable_automation",
+  "enable_bot_builder",
+  "enable_ai_assist",
+  "ai_provider",
+  "column_break_ai",
+  "ai_api_key",
+  "ai_model",
+  "ai_system_prompt",
+  "security_section",
+  "enable_audit_log",
+  "message_retention_days",
+  "mask_phone_numbers",
+  "allow_agents_export"
+ ],
+ "fields": [
+  {
+   "fieldname": "accounts_section",
+   "fieldtype": "Section Break",
+   "label": "Accounts"
+  },
+  {
+   "fieldname": "default_incoming_account",
+   "fieldtype": "Link",
+   "label": "Default Incoming Account",
+   "options": "WhatsApp Account"
+  },
+  {
+   "fieldname": "column_break_accounts",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_outgoing_account",
+   "fieldtype": "Link",
+   "label": "Default Outgoing Account",
+   "options": "WhatsApp Account"
+  },
+  {
+   "fieldname": "inbox_section",
+   "fieldtype": "Section Break",
+   "label": "Unified Inbox & Agent Controls"
+  },
+  {
+   "fieldname": "enable_command_center",
+   "fieldtype": "Check",
+   "label": "Enable WhatsApp Command Center",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_unified_inbox",
+   "fieldtype": "Check",
+   "label": "Enable Unified Inbox",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_agent_assignment",
+   "fieldtype": "Check",
+   "label": "Enable Agent Assignment",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_teams",
+   "fieldtype": "Check",
+   "label": "Enable Team Queues",
+   "default": "1"
+  },
+  {
+   "fieldname": "column_break_inbox",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_agent",
+   "fieldtype": "Link",
+   "label": "Default Agent",
+   "options": "User"
+  },
+  {
+   "fieldname": "auto_assign_strategy",
+   "fieldtype": "Select",
+   "label": "Auto Assignment Strategy",
+   "options": "Manual\nRound Robin\nLeast Active",
+   "default": "Manual"
+  },
+  {
+   "fieldname": "conversation_close_after_hours",
+   "fieldtype": "Int",
+   "label": "Auto-close Inactive Conversation After (Hours)",
+   "default": "72"
+  },
+  {
+   "fieldname": "sla_minutes",
+   "fieldtype": "Int",
+   "label": "First Response SLA (Minutes)",
+   "default": "15"
+  },
+  {
+   "fieldname": "crm_section",
+   "fieldtype": "Section Break",
+   "label": "ERPNext CRM & Support"
+  },
+  {
+   "fieldname": "enable_crm_linking",
+   "fieldtype": "Check",
+   "label": "Auto-link Contacts, Leads and Customers",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_issue_creation",
+   "fieldtype": "Check",
+   "label": "Allow Issue Creation from Chat",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_opportunity_creation",
+   "fieldtype": "Check",
+   "label": "Allow Opportunity Creation from Chat",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_document_sharing",
+   "fieldtype": "Check",
+   "label": "Enable ERP Document Sharing",
+   "default": "1"
+  },
+  {
+   "fieldname": "column_break_crm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "phone_match_field",
+   "fieldtype": "Select",
+   "label": "Primary Phone Matching Field",
+   "options": "mobile_no\nphone",
+   "default": "mobile_no"
+  },
+  {
+   "fieldname": "default_issue_type",
+   "fieldtype": "Link",
+   "label": "Default Issue Type",
+   "options": "Issue Type"
+  },
+  {
+   "fieldname": "default_support_team",
+   "fieldtype": "Link",
+   "label": "Default Support Team",
+   "options": "User Group"
+  },
+  {
+   "fieldname": "campaign_section",
+   "fieldtype": "Section Break",
+   "label": "Campaigns & Compliance"
+  },
+  {
+   "fieldname": "enable_campaigns",
+   "fieldtype": "Check",
+   "label": "Enable Campaign Center",
+   "default": "1"
+  },
+  {
+   "fieldname": "require_opt_in",
+   "fieldtype": "Check",
+   "label": "Require Explicit Opt-in",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_quiet_hours",
+   "fieldtype": "Check",
+   "label": "Enable Quiet Hours",
+   "default": "1"
+  },
+  {
+   "fieldname": "quiet_hours_start",
+   "fieldtype": "Time",
+   "label": "Quiet Hours Start",
+   "default": "21:00:00"
+  },
+  {
+   "fieldname": "quiet_hours_end",
+   "fieldtype": "Time",
+   "label": "Quiet Hours End",
+   "default": "09:00:00"
+  },
+  {
+   "fieldname": "column_break_campaign",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "campaign_batch_size",
+   "fieldtype": "Int",
+   "label": "Campaign Batch Size",
+   "default": "50"
+  },
+  {
+   "fieldname": "campaign_rate_per_minute",
+   "fieldtype": "Int",
+   "label": "Maximum Messages per Minute",
+   "default": "60"
+  },
+  {
+   "fieldname": "stop_keywords",
+   "fieldtype": "Small Text",
+   "label": "Opt-out Keywords",
+   "default": "STOP, UNSUBSCRIBE, CANCEL"
+  },
+  {
+   "fieldname": "automation_section",
+   "fieldtype": "Section Break",
+   "label": "Automation & AI"
+  },
+  {
+   "fieldname": "enable_automation",
+   "fieldtype": "Check",
+   "label": "Enable Automation Rules",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_bot_builder",
+   "fieldtype": "Check",
+   "label": "Enable Bot Workflow Builder",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_ai_assist",
+   "fieldtype": "Check",
+   "label": "Enable AI Reply Assistance"
+  },
+  {
+   "fieldname": "ai_provider",
+   "fieldtype": "Select",
+   "label": "AI Provider",
+   "options": "OpenAI\nGemini\nOpenRouter",
+   "depends_on": "eval:doc.enable_ai_assist"
+  },
+  {
+   "fieldname": "column_break_ai",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ai_api_key",
+   "fieldtype": "Password",
+   "label": "AI API Key",
+   "depends_on": "eval:doc.enable_ai_assist"
+  },
+  {
+   "fieldname": "ai_model",
+   "fieldtype": "Data",
+   "label": "AI Model",
+   "depends_on": "eval:doc.enable_ai_assist"
+  },
+  {
+   "fieldname": "ai_system_prompt",
+   "fieldtype": "Small Text",
+   "label": "AI System Prompt",
+   "depends_on": "eval:doc.enable_ai_assist"
+  },
+  {
+   "fieldname": "security_section",
+   "fieldtype": "Section Break",
+   "label": "Security, Audit & Retention"
+  },
+  {
+   "fieldname": "enable_audit_log",
+   "fieldtype": "Check",
+   "label": "Enable Audit Log",
+   "default": "1"
+  },
+  {
+   "fieldname": "message_retention_days",
+   "fieldtype": "Int",
+   "label": "Message Retention (Days)",
+   "default": "365"
+  },
+  {
+   "fieldname": "mask_phone_numbers",
+   "fieldtype": "Check",
+   "label": "Mask Phone Numbers for Non-managers"
+  },
+  {
+   "fieldname": "allow_agents_export",
+   "fieldtype": "Check",
+   "label": "Allow Agents to Export Conversations"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-12-01 13:22:14.262545",
+ "modified_by": "Administrator",
+ "module": "Frappe Whatsapp",
+ "name": "WhatsApp Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

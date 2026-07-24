@@ -1,0 +1,89 @@
+{
+ "doctype": "DocType",
+ "name": "WhatsApp Flow Data",
+ "module": "Frappe Whatsapp",
+ "autoname": "hash",
+ "engine": "InnoDB",
+ "track_changes": 1,
+ "field_order": [
+  "flow_token",
+  "flow",
+  "whatsapp_account",
+  "phone_number",
+  "last_screen",
+  "status",
+  "data",
+  "completed_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "flow_token",
+   "fieldtype": "Data",
+   "label": "Flow Token",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "flow",
+   "fieldtype": "Link",
+   "options": "WhatsApp Flow",
+   "label": "Flow"
+  },
+  {
+   "fieldname": "whatsapp_account",
+   "fieldtype": "Link",
+   "options": "WhatsApp Account",
+   "label": "WhatsApp Account"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "last_screen",
+   "fieldtype": "Data",
+   "label": "Last Screen"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "options": "Started\nIn Progress\nCompleted\nFailed",
+   "default": "Started"
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Code",
+   "options": "JSON",
+   "label": "Data"
+  },
+  {
+   "fieldname": "completed_at",
+   "fieldtype": "Datetime",
+   "label": "Completed At",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "WhatsApp Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "export": 1
+  }
+ ]
+}

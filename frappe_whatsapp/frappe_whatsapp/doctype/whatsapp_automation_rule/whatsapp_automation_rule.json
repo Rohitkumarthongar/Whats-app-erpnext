@@ -1,0 +1,122 @@
+{
+ "doctype": "DocType",
+ "name": "WhatsApp Automation Rule",
+ "module": "Frappe Whatsapp",
+ "engine": "InnoDB",
+ "allow_rename": 1,
+ "track_changes": 1,
+ "field_order": [
+  "enabled",
+  "rule_name",
+  "trigger_type",
+  "keyword",
+  "reference_doctype",
+  "condition",
+  "action_type",
+  "response_message",
+  "template",
+  "assign_to",
+  "priority"
+ ],
+ "fields": [
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "rule_name",
+   "fieldtype": "Data",
+   "label": "Rule Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "trigger_type",
+   "fieldtype": "Select",
+   "label": "Trigger",
+   "options": "Incoming Keyword\nIncoming Message\nConversation Created\nConversation Inactive\nDocument Event",
+   "reqd": 1
+  },
+  {
+   "fieldname": "keyword",
+   "fieldtype": "Data",
+   "label": "Keyword"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Reference DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "condition",
+   "fieldtype": "Code",
+   "label": "Condition (Safe Python)",
+   "options": "Python"
+  },
+  {
+   "fieldname": "action_type",
+   "fieldtype": "Select",
+   "label": "Action",
+   "options": "Send Text\nSend Template\nAssign Agent\nCreate Issue\nCreate Lead\nUpdate Conversation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "response_message",
+   "fieldtype": "Small Text",
+   "label": "Response Message"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "WhatsApp Template",
+   "options": "WhatsApp Templates"
+  },
+  {
+   "fieldname": "assign_to",
+   "fieldtype": "Link",
+   "label": "Assign To",
+   "options": "User"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Execution Priority",
+   "default": "10"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "share": 1
+  },
+  {
+   "role": "WhatsApp Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "WhatsApp Agent",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1
+  }
+ ],
+ "title_field": "rule_name",
+ "sort_field": "priority",
+ "sort_order": "ASC"
+}

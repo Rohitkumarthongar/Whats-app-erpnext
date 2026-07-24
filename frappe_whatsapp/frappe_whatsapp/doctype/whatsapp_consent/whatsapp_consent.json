@@ -1,0 +1,108 @@
+{
+ "doctype": "DocType",
+ "name": "WhatsApp Consent",
+ "module": "Frappe Whatsapp",
+ "engine": "InnoDB",
+ "allow_rename": 1,
+ "track_changes": 1,
+ "field_order": [
+  "phone_number",
+  "status",
+  "source",
+  "consent_datetime",
+  "proof",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "Phone Number",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Opted In\nOpted Out",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "label": "Source",
+   "options": "WhatsApp\nWeb Form\nManual\nImport\nERP Document"
+  },
+  {
+   "fieldname": "consent_datetime",
+   "fieldtype": "Datetime",
+   "label": "Consent Date & Time",
+   "default": "Now"
+  },
+  {
+   "fieldname": "proof",
+   "fieldtype": "Attach",
+   "label": "Consent Proof"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "whatsapp_account",
+   "fieldtype": "Link",
+   "options": "WhatsApp Account",
+   "label": "WhatsApp Account"
+  },
+  {
+   "fieldname": "opt_out_datetime",
+   "fieldtype": "Datetime",
+   "label": "Opt-out Datetime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_reference_doctype",
+   "fieldtype": "Link",
+   "options": "DocType",
+   "label": "Source DocType"
+  },
+  {
+   "fieldname": "source_reference_name",
+   "fieldtype": "Dynamic Link",
+   "options": "source_reference_doctype",
+   "label": "Source Document"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "share": 1
+  },
+  {
+   "role": "WhatsApp Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "WhatsApp Agent",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1
+  }
+ ],
+ "autoname": "field:phone_number"
+}

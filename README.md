@@ -9,7 +9,7 @@
 
 # Frappe WhatsApp
 
-[Documentation](https://shridarpatil.github.io/frappe_whatsapp/)
+[Documentation](https://Rohitkumarthongar.github.io/frappe_whatsapp/)
 
 WhatsApp integration for Frappe/ERPNext. Use Meta's WhatsApp Cloud API directly without any third-party integration.
 
@@ -39,7 +39,7 @@ WhatsApp integration for Frappe/ERPNext. Use Meta's WhatsApp Cloud API directly 
 
 ### Step 1: Get the app
 ```bash
-bench get-app https://github.com/shridarpatil/frappe_whatsapp
+bench get-app https://github.com/Rohitkumarthongar/Whats-app-erpnext
 ```
 
 ### Step 2: Install on your site
@@ -217,7 +217,7 @@ A chat app for Frappe Desk to manage WhatsApp conversations.
 | | |
 |---|---|
 | **Features** | Real-time messaging, media support, contact management, read receipts |
-| **Install** | `bench get-app https://github.com/shridarpatil/whatsapp_chat` |
+| **Install** | `bench get-app https://github.com/Rohitkumarthongar/whatsapp_chat` |
 | **Marketplace** | <a href="https://frappecloud.com/marketplace/apps/whatsapp_chat"><img src="https://frappe.io/files/try-on-fc-black.png" alt="Try on Frappe Cloud" height="28" /></a> |
 | **Use Cases** | Customer conversations, sales follow-ups, support tickets |
 
@@ -227,13 +227,13 @@ Build automated chatbots with flows, keyword replies, and AI-powered responses.
 | | |
 |---|---|
 | **Features** | Multi-step flows, keyword matching, AI fallback (OpenAI/Anthropic/Google), session management |
-| **Install** | `bench get-app https://github.com/shridarpatil/frappe_whatsapp_chatbot` |
+| **Install** | `bench get-app https://github.com/Rohitkumarthongar/Whats-app-erpnext_chatbot` |
 | **Marketplace** | <a href="https://frappecloud.com/marketplace/apps/frappe_whatsapp_chatbot"><img src="https://frappe.io/files/try-on-fc-black.png" alt="Try on Frappe Cloud" height="28" /></a> |
 | **Use Cases** | Customer support, order status, appointment booking, lead capture |
 
 ## Documentation
 
-For detailed documentation, visit [https://shridarpatil.github.io/frappe_whatsapp/](https://shridarpatil.github.io/frappe_whatsapp/)
+For detailed documentation, visit [https://Rohitkumarthongar.github.io/frappe_whatsapp/](https://Rohitkumarthongar.github.io/frappe_whatsapp/)
 
 ## Contributing
 
@@ -242,4 +242,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 MIT
-# Whats-app-erpnext
