@@ -35,7 +35,7 @@ def get_boot_data():
         "messages_today": frappe.db.count("WhatsApp Message", {"creation": [">=", today_start]}),
         "sla_breached": frappe.db.count("WhatsApp Conversation", {"sla_breached": 1}),
     }
-    delivery = {row.status or "Unknown": row.total for row in frappe.get_all("WhatsApp Message", fields=["status", "count(name) as total"], group_by="status")}
+    delivery = {row.status or "Unknown": row.total for row in frappe.get_all("WhatsApp Message", fields=["status", {"COUNT": "name", "as": "total"}], group_by="status")}
     return {"kpis": kpis, "conversations": conversations, "delivery": delivery, "settings": _settings()}
 
 

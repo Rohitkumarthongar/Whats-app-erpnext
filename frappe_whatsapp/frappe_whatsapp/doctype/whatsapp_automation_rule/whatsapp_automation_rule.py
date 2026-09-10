@@ -1,4 +1,4 @@
 from frappe.model.document import Document
 
-class WhatsappAutomationRule(Document):
+class WhatsAppAutomationRule(Document):
     pass
