@@ -53,10 +53,20 @@ class WhatsAppAccount(Document):
 			response = make_post_request(endpoint, headers=headers)
 		except Exception as e:
 			error_message = str(e)
-			if frappe.flags.integration_request:
-				err = frappe.flags.integration_request.json().get("error", {})
-				if err:
-					error_message = err.get("message") or err.get("Error") or error_message
+			request_response = getattr(frappe.flags, "integration_request", None)
+			if request_response is not None:
+				try:
+					error = request_response.json().get("error", {})
+				except (AttributeError, TypeError, ValueError):
+					error = {}
+
+				if error:
+					error_message = error.get("message") or error_message
+					if error.get("code"):
+						error_message = f"Meta error {error['code']}: {error_message}"
+					if error.get("error_subcode"):
+						error_message += f" (subcode {error['error_subcode']})"
+
 			frappe.throw(_("Failed to subscribe app to webhooks: {0}").format(error_message))
 
 		if not response.get("success"):

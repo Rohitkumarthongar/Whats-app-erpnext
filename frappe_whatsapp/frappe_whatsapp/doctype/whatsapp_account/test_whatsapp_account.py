@@ -1,6 +1,8 @@
 # Copyright (c) 2025, Rohit Kumar Soni and Contributors
 # See license.txt
 
+from unittest.mock import Mock, patch
+
 import frappe
 from frappe_whatsapp.testing import IntegrationTestCase
 
@@ -42,6 +44,31 @@ class TestWhatsAppAccount(IntegrationTestCase):
             from frappe.utils.password import set_encrypted_password
             set_encrypted_password("WhatsApp Account", doc.name, kwargs["token"], "token")
         return doc
+
+    def test_subscribe_app_reports_meta_error_details(self):
+        """Meta's response body should be included when subscription fails."""
+        doc = self._make_account(
+            account_name="Test WA Account Subscribe Error",
+            token="test_token",
+        )
+        response = Mock()
+        response.json.return_value = {
+            "error": {
+                "message": "Permissions error",
+                "code": 200,
+                "error_subcode": 12345,
+            }
+        }
+        frappe.flags.integration_request = response
+
+        with patch(
+            "frappe_whatsapp.frappe_whatsapp.doctype.whatsapp_account.whatsapp_account.make_post_request",
+            side_effect=frappe.ValidationError("400 Client Error"),
+        ), self.assertRaisesRegex(
+            frappe.ValidationError,
+            r"Meta error 200: Permissions error \(subcode 12345\)",
+        ):
+            doc.subscribe_app()
 
     def test_account_creation(self):
         """Test basic account creation."""
