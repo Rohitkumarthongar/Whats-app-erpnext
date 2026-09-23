@@ -15,10 +15,16 @@ class WhatsAppCommandCenter {
   }
   make() {
     $(this.page.body).html(`<div class="wa-center">
-      <div class="wa-tabs"><button data-view="dashboard" class="active">Dashboard</button><button data-view="inbox">Inbox</button><button data-view="campaigns">Campaigns</button><button data-view="automation">Automation</button><button data-view="settings">Settings</button></div>
-      <div class="wa-content"><div class="wa-loading">${__("Loading WhatsApp workspace...")}</div></div></div>`);
-    this.page.body.on("click", ".wa-tabs button", (e) => {
-      this.page.body.find(".wa-tabs button").removeClass("active");
+      <nav class="wa-sidebar">
+        <button data-view="dashboard" class="active"><span>${__("Dashboard")}</span></button>
+        <button data-view="inbox"><span>${__("Inbox")}</span></button>
+        <button data-view="campaigns" class="wa-nav-optional" data-flag="enable_campaigns"><span>${__("Campaigns")}</span></button>
+        <button data-view="automation" class="wa-nav-optional" data-flag="enable_automation"><span>${__("Automation")}</span></button>
+        <button data-view="settings"><span>${__("Settings")}</span></button>
+      </nav>
+      <div class="wa-main"><div class="wa-content"><div class="wa-loading">${__("Loading WhatsApp workspace...")}</div></div></div></div>`);
+    this.page.body.on("click", ".wa-sidebar button", (e) => {
+      this.page.body.find(".wa-sidebar button").removeClass("active");
       $(e.currentTarget).addClass("active");
       this.render($(e.currentTarget).data("view"));
     });
@@ -28,11 +34,18 @@ class WhatsAppCommandCenter {
       "frappe_whatsapp.frappe_whatsapp.api.command_center.get_boot_data",
     );
     this.data = r.message || {};
+    // Campaigns / Automation are advanced surfaces most teams don't need in
+    // the main nav — show them only when turned on in WhatsApp Settings.
+    this.page.body.find(".wa-nav-optional").each((_, el) => {
+      const flag = $(el).data("flag");
+      $(el).toggle(!!(this.data.settings || {})[flag]);
+    });
     this.render("dashboard");
   }
   render(view) {
     if (!this.data) return;
     const fn = this[`render_${view}`] || this.render_dashboard;
+    this.page.body.find(".wa-main").toggleClass("wa-main-flush", view === "inbox");
     this.page.body.find(".wa-content").html(fn.call(this));
     this.bind(view);
   }
