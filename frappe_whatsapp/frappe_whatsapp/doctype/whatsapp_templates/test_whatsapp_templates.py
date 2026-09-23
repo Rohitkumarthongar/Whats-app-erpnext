@@ -121,7 +121,7 @@ class TestWhatsAppTemplates(IntegrationTestCase):
             header="Order Update"
         )
         header = doc.get_header()
-        self.assertEqual(header["type"], "header")
+        self.assertEqual(header["type"], "HEADER")
         self.assertEqual(header["format"], "TEXT")
         self.assertEqual(header["text"], "Order Update")
 

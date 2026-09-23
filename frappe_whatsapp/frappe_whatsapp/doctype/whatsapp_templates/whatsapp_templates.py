@@ -6,6 +6,7 @@ import json
 import frappe
 import magic
 import requests
+from frappe import _
 from frappe.model.document import Document
 from frappe.integrations.utils import make_post_request, make_request
 from frappe.desk.form.utils import get_pdf_link
@@ -25,7 +26,7 @@ class WhatsAppTemplates(Document):  # nosemgrep: frappe-modifying-but-not-commit
             self.get_session_id(self.sample)
             self.get_media_id(self.sample)
 
-        if not self.is_new():
+        if not self.is_new() and self._template_needs_remote_update():
             self.update_template()
 
     def set_whatsapp_account(self):
@@ -36,6 +37,23 @@ class WhatsAppTemplates(Document):  # nosemgrep: frappe-modifying-but-not-commit
                 throw(_("Please set a default outgoing WhatsApp Account or Select available WhatsApp Account"))
             else:
                 self.whatsapp_account = default_whatsapp_account.name
+
+    def _template_needs_remote_update(self):
+        """Only call Meta when a field that is part of the template changed."""
+        return any(
+            self.has_value_changed(fieldname)
+            for fieldname in (
+                "template",
+                "sample_values",
+                "category",
+                "language",
+                "header_type",
+                "header",
+                "sample",
+                "footer",
+                "buttons",
+            )
+        )
 
     def get_session_id(self, file):
         """Upload media."""
@@ -239,13 +257,20 @@ class WhatsAppTemplates(Document):  # nosemgrep: frappe-modifying-but-not-commit
                 headers=self._headers,
                 data=json.dumps(data),
             )
-        except Exception as e:
-            raise e
-            # res = frappe.flags.integration_request.json()['error']
-            # frappe.throw(
-            #     msg=res.get('error_user_msg', res.get("message")),
-            #     title=res.get("error_user_title", "Error"),
-            # )
+        except Exception:
+            request = getattr(frappe.flags, "integration_request", None)
+            try:
+                error = request.json().get("error", {}) if request else {}
+            except (AttributeError, TypeError, ValueError):
+                error = {}
+
+            message = error.get("error_user_msg") or error.get("message")
+            if not message:
+                message = _("Meta rejected the WhatsApp template update.")
+            frappe.throw(
+                msg=message,
+                title=error.get("error_user_title") or _("WhatsApp Template Update Failed"),
+            )
 
     def get_settings(self):
         """Get whatsapp settings."""
@@ -283,7 +308,7 @@ class WhatsAppTemplates(Document):  # nosemgrep: frappe-modifying-but-not-commit
 
     def get_header(self):
         """Get header format."""
-        header = {"type": "header", "format": self.header_type}
+        header = {"type": "HEADER", "format": self.header_type}
         if self.header_type == "TEXT":
             header["text"] = self.header
             if self.sample:
