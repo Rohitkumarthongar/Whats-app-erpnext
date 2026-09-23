@@ -44,10 +44,11 @@ def get_conversation(conversation):
     require_roles(ROLES)
     conv = _conversation(conversation)
     filters = {"conversation": conv.name}
-    messages = frappe.get_all("WhatsApp Message", filters=filters, fields=["name", "type", "message", "content_type", "creation", "status", "attach", "failure_reason"], order_by="creation asc", limit=500)
+    message_fields = ["name", "type", "message", "content_type", "creation", "status", "attach", "failure_reason", "template", "message_type"]
+    messages = frappe.get_all("WhatsApp Message", filters=filters, fields=message_fields, order_by="creation asc", limit=500)
     if not messages:  # migration-safe fallback for older rows
-        messages = frappe.get_all("WhatsApp Message", filters={"whatsapp_account": conv.whatsapp_account, "from": conv.phone_number}, fields=["name", "type", "message", "content_type", "creation", "status", "attach", "failure_reason"], order_by="creation asc", limit=250)
-        messages += frappe.get_all("WhatsApp Message", filters={"whatsapp_account": conv.whatsapp_account, "to": conv.phone_number}, fields=["name", "type", "message", "content_type", "creation", "status", "attach", "failure_reason"], order_by="creation asc", limit=250)
+        messages = frappe.get_all("WhatsApp Message", filters={"whatsapp_account": conv.whatsapp_account, "from": conv.phone_number}, fields=message_fields, order_by="creation asc", limit=250)
+        messages += frappe.get_all("WhatsApp Message", filters={"whatsapp_account": conv.whatsapp_account, "to": conv.phone_number}, fields=message_fields, order_by="creation asc", limit=250)
         messages = sorted(messages, key=lambda x: str(x.creation))
     if conv.unread_count:
         frappe.db.set_value("WhatsApp Conversation", conv.name, "unread_count", 0, update_modified=False)

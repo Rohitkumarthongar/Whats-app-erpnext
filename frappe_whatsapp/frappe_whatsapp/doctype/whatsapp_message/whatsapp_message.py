@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Rohit Kumar Soni and contributors
 # For license information, please see license.txt
 import json
+import re
 import frappe
 from frappe import _, throw
 from frappe.model.document import Document
@@ -233,6 +234,16 @@ class WhatsAppMessage(Document):
                     template_parameters.append(value)
 
             self.template_parameters = json.dumps(template_parameters)
+
+        # Store the rendered body so the conversation list and inbox show the
+        # actual text instead of falling back to content_type ("text").
+        if not self.message:
+            values = iter(template_parameters)
+            self.message = re.sub(
+                r"\{\{.*?\}\}",
+                lambda _match: str(next(values, "")),
+                template.template or "",
+            )
 
         # Always add the body component, even if parameters list is empty
         data["template"]["components"].append({
