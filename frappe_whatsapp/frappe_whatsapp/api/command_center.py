@@ -87,11 +87,16 @@ def send_text(conversation, message=None, attach=None, content_type="text", temp
 
     doc = frappe.get_doc(doc_args)
     doc.insert(ignore_permissions=True)
-    conv.last_message = message
-    conv.last_message_at = now_datetime()
+
+    now = now_datetime()
+    updates = {
+        "last_message": message,
+        "last_message_at": now,
+    }
     if not conv.first_response_at and frappe.db.exists("WhatsApp Message", {"conversation": conv.name, "type": "Incoming"}):
-        conv.first_response_at = now_datetime()
-    conv.save(ignore_permissions=True)
+        updates["first_response_at"] = now
+
+    frappe.db.set_value("WhatsApp Conversation", conv.name, updates, update_modified=False)
     return doc.name
 
 
