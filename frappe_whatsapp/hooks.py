@@ -119,7 +119,8 @@ scheduler_events = {
         "frappe_whatsapp.utils.trigger_whatsapp_notifications_all"
     ],
     "hourly": [
-        "frappe_whatsapp.utils.trigger_whatsapp_notifications_hourly"
+        "frappe_whatsapp.utils.trigger_whatsapp_notifications_hourly",
+        "frappe_whatsapp.utils.conversation.close_expired_conversations",
     ],
     "hourly_long": [
         "frappe_whatsapp.utils.trigger_whatsapp_notifications_hourly_long"

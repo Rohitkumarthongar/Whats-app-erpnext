@@ -5,6 +5,7 @@ from frappe import _
 from frappe.utils import now_datetime, today
 
 from frappe_whatsapp.utils.security import normalize_phone, require_roles
+from frappe_whatsapp.utils.conversation import close_expired_conversations
 
 ROLES = ("System Manager", "WhatsApp Manager", "WhatsApp Agent")
 MANAGER_ROLES = ("System Manager", "WhatsApp Manager")
@@ -27,7 +28,8 @@ def _conversation(name):
 @frappe.whitelist()
 def get_boot_data():
     require_roles(ROLES)
-    conversations = frappe.get_all("WhatsApp Conversation", fields=["name", "customer_name", "phone_number", "whatsapp_account", "status", "assigned_to", "last_message", "last_message_at", "unread_count", "sla_breached"], order_by="last_message_at desc", limit=50)
+    close_expired_conversations()
+    conversations = frappe.get_all("WhatsApp Conversation", filters={"status": ["in", ["Open", "Pending", "Resolved"]]}, fields=["name", "customer_name", "phone_number", "whatsapp_account", "status", "assigned_to", "last_message", "last_message_at", "last_incoming_at", "unread_count", "sla_breached"], order_by="last_message_at desc", limit=50)
     today_start = f"{today()} 00:00:00"
     kpis = {
         "open_conversations": frappe.db.count("WhatsApp Conversation", {"status": ["in", ["Open", "Pending"]]}),
@@ -52,6 +54,8 @@ def get_conversation(conversation):
         messages = sorted(messages, key=lambda x: str(x.creation))
     if conv.unread_count:
         frappe.db.set_value("WhatsApp Conversation", conv.name, "unread_count", 0, update_modified=False)
+    close_expired_conversations()
+    conv.reload()
     return {"conversation": conv.as_dict(), "messages": messages}
 
 
@@ -59,6 +63,10 @@ def get_conversation(conversation):
 def send_text(conversation, message=None, attach=None, content_type="text", template=None):
     require_roles(ROLES)
     conv = _conversation(conversation)
+    close_expired_conversations()
+    conv.reload()
+    if conv.status == "Closed" and not template:
+        frappe.throw(_("This chat is closed because the customer has not replied within 24 hours. WhatsApp will not reset this window with an outbound message; wait for the customer to message again."))
     message = (message or "").strip()
     if not message and not attach and not template:
         frappe.throw(_("Message, attachment, or template is required"))
@@ -94,6 +102,8 @@ def send_text(conversation, message=None, attach=None, content_type="text", temp
         "last_message": message,
         "last_message_at": now,
     }
+    if conv.status == "Closed" and template:
+        updates.update({"status": "Open", "closed_at": None})
     if not conv.first_response_at and frappe.db.exists("WhatsApp Message", {"conversation": conv.name, "type": "Incoming"}):
         updates["first_response_at"] = now
 
