@@ -29,7 +29,17 @@ def _conversation(name):
 def get_boot_data():
     require_roles(ROLES)
     close_expired_conversations()
-    conversations = frappe.get_all("WhatsApp Conversation", filters={"status": ["in", ["Open", "Pending", "Resolved"]]}, fields=["name", "customer_name", "phone_number", "whatsapp_account", "status", "assigned_to", "last_message", "last_message_at", "last_incoming_at", "unread_count", "sla_breached"], order_by="last_message_at desc", limit=50)
+    conversations = frappe.get_all(
+        "WhatsApp Conversation",
+        filters={"status": ["in", ["Open", "Pending", "Resolved"]]},
+        fields=[
+            "name", "customer_name", "phone_number", "whatsapp_account", "status", "priority",
+            "assigned_to", "last_message", "last_message_at", "last_incoming_at",
+            "unread_count", "sla_breached", "opt_in_status", "tags",
+        ],
+        order_by="last_message_at desc",
+        limit=50,
+    )
     today_start = f"{today()} 00:00:00"
     kpis = {
         "open_conversations": frappe.db.count("WhatsApp Conversation", {"status": ["in", ["Open", "Pending"]]}),
@@ -38,7 +48,16 @@ def get_boot_data():
         "sla_breached": frappe.db.count("WhatsApp Conversation", {"sla_breached": 1}),
     }
     delivery = {row.status or "Unknown": row.total for row in frappe.get_all("WhatsApp Message", fields=["status", {"COUNT": "name", "as": "total"}], group_by="status")}
-    return {"kpis": kpis, "conversations": conversations, "delivery": delivery, "settings": _settings()}
+    status_counts = {row.status or "Unknown": row.total for row in frappe.get_all("WhatsApp Conversation", fields=["status", {"COUNT": "name", "as": "total"}], group_by="status")}
+    priority_counts = {row.priority or "Unset": row.total for row in frappe.get_all("WhatsApp Conversation", fields=["priority", {"COUNT": "name", "as": "total"}], group_by="priority")}
+    return {
+        "kpis": kpis,
+        "conversations": conversations,
+        "delivery": delivery,
+        "status_counts": status_counts,
+        "priority_counts": priority_counts,
+        "settings": _settings(),
+    }
 
 
 @frappe.whitelist()
@@ -112,6 +131,40 @@ def send_text(conversation, message=None, attach=None, content_type="text", temp
 
 
 @frappe.whitelist(methods=["POST"])
+def start_conversation(phone_number, message=None, template=None, customer_name=None, whatsapp_account=None):
+    require_roles(ROLES)
+    phone = normalize_phone(phone_number)
+    if not (message or "").strip() and not template:
+        frappe.throw(_("Enter a message or choose a template"))
+
+    conv_name = frappe.db.get_value("WhatsApp Conversation", {"phone_number": phone}, "name")
+    if conv_name:
+        if customer_name:
+            frappe.db.set_value("WhatsApp Conversation", conv_name, "customer_name", customer_name, update_modified=False)
+    else:
+        account = (
+            whatsapp_account
+            or frappe.db.get_single_value("WhatsApp Settings", "default_outgoing_account")
+            or frappe.db.get_value("WhatsApp Account", {"is_default_outgoing": 1}, "name")
+            or frappe.db.get_value("WhatsApp Account", {"status": "Active"}, "name")
+        )
+        if not account:
+            frappe.throw(_("No WhatsApp Account is configured"))
+        conv = frappe.get_doc({
+            "doctype": "WhatsApp Conversation",
+            "phone_number": phone,
+            "customer_name": customer_name or phone,
+            "whatsapp_account": account,
+            "status": "Open",
+        })
+        conv.insert(ignore_permissions=True)
+        conv_name = conv.name
+
+    send_text(conversation=conv_name, message=message, template=template)
+    return {"conversation": conv_name}
+
+
+@frappe.whitelist(methods=["POST"])
 def assign_conversation(conversation, user):
     require_roles(MANAGER_ROLES)
     conv = frappe.get_doc("WhatsApp Conversation", conversation)
@@ -120,6 +173,30 @@ def assign_conversation(conversation, user):
     conv.assigned_to = user
     conv.save(ignore_permissions=True)
     return user
+
+
+VALID_STATUSES = ("Open", "Pending", "Resolved", "Closed")
+VALID_PRIORITIES = ("Low", "Medium", "High", "Urgent")
+
+
+@frappe.whitelist(methods=["POST"])
+def update_conversation(conversation, status=None, priority=None):
+    require_roles(ROLES)
+    conv = _conversation(conversation)
+    if status:
+        if status not in VALID_STATUSES:
+            frappe.throw(_("Invalid status"))
+        conv.status = status
+        if status == "Closed":
+            conv.closed_at = now_datetime()
+        elif not conv.opened_at:
+            conv.opened_at = now_datetime()
+    if priority:
+        if priority not in VALID_PRIORITIES:
+            frappe.throw(_("Invalid priority"))
+        conv.priority = priority
+    conv.save(ignore_permissions=True)
+    return conv.as_dict()
 
 
 @frappe.whitelist(methods=["POST"])
