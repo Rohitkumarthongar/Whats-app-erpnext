@@ -13,3 +13,14 @@ class WhatsAppSettings(Document):
             frappe.throw(_("Default incoming account must be active"))
         if self.default_outgoing_account and frappe.db.get_value("WhatsApp Account", self.default_outgoing_account, "status") != "Active":
             frappe.throw(_("Default outgoing account must be active"))
+        self.validate_flow_notifications()
+
+    def validate_flow_notifications(self):
+        from frappe_whatsapp.utils.flow_notifications import validate_flow_notifications
+
+        validate_flow_notifications(self.get("flow_notifications") or [])
+
+    def on_update(self):
+        from frappe_whatsapp.utils.flow_notifications import clear_flow_notification_cache
+
+        clear_flow_notification_cache()

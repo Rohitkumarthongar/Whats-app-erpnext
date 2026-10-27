@@ -222,7 +222,17 @@ doc_events = {
 
 
 # Enhanced command-center synchronization
-doc_events.setdefault("WhatsApp Message", {})["after_insert"] = "frappe_whatsapp.utils.conversation.sync_message_to_conversation"
+doc_events.setdefault("WhatsApp Message", {})["after_insert"] = [
+    "frappe_whatsapp.utils.conversation.sync_message_to_conversation",
+    # Approve / Reject quick replies on workflow templates
+    "frappe_whatsapp.utils.flow_notifications.on_whatsapp_message",
+]
+
+# Flow notifications (WhatsApp Settings → Flow Notifications): a cached per-DocType
+# check, so DocTypes without a configured row return immediately.
+for _flow_event in ("after_insert", "on_submit", "on_cancel", "on_update", "on_update_after_submit"):
+    _existing = doc_events["*"][_flow_event]
+    doc_events["*"][_flow_event] = [_existing, "frappe_whatsapp.utils.flow_notifications.handle_document_event"]
 after_install = "frappe_whatsapp.install.after_install"
 after_migrate = "frappe_whatsapp.install.after_migrate"
 before_install = "frappe_whatsapp.install.create_roles"
