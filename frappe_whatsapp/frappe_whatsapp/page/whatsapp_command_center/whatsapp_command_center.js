@@ -174,14 +174,14 @@ class WhatsAppCommandCenter {
     if (!rows.length) return `<div class="wa-empty">${__("No conversations match this view.")}</div>`;
     return rows
       .map((x) => {
-        const initial = (x.customer_name || x.phone_number || "?")[0].toUpperCase();
+        const initial = (x.display_name || x.customer_name || x.phone_number || "?")[0].toUpperCase();
         const classes = ["wa-conv"];
         if (x.name === this.selected) classes.push("active");
         if (x.unread_count) classes.push("unread");
         return `<div class="${classes.join(" ")}" data-name="${esc(x.name)}">
-          <div class="avatar" style="background:${this.avatar_color(x.customer_name || x.phone_number)}">${esc(initial)}</div>
+          <div class="avatar" style="background:${this.avatar_color(x.display_name || x.customer_name || x.phone_number)}">${esc(initial)}</div>
           <div class="wa-conv-body">
-            <div class="wa-conv-top"><b>${esc(x.customer_name || x.phone_number)}</b><span class="wa-conv-time">${this.relative_time(x.last_message_at)}</span></div>
+            <div class="wa-conv-top"><b>${esc(x.display_name || x.customer_name || x.phone_number)}</b><span class="wa-conv-time">${this.relative_time(x.last_message_at)}</span></div>
             <div class="wa-conv-bottom"><small>${esc(x.last_message || "")}</small>${x.unread_count ? `<span class="wa-badge">${x.unread_count}</span>` : ""}</div>
           </div>
           <div class="wa-conv-flags">
@@ -200,7 +200,7 @@ class WhatsAppCommandCenter {
       if (f.unread_only && !(c.unread_count > 0)) return false;
       if (f.sla_only && !c.sla_breached) return false;
       if (q) {
-        const hay = `${c.customer_name || ""} ${c.phone_number || ""} ${c.last_message || ""}`.toLowerCase();
+        const hay = `${c.display_name || ""} ${c.customer_name || ""} ${c.phone_number || ""} ${c.last_message || ""}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -367,7 +367,7 @@ class WhatsAppCommandCenter {
       })
       .join("");
 
-    const displayName = conv.customer_name || conv.phone_number;
+    const displayName = conv.display_name || conv.customer_name || conv.phone_number;
     this.page.body
       .find(".wa-inbox main")
       .html(

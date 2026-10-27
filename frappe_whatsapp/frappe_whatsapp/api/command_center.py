@@ -5,6 +5,7 @@ from frappe import _
 from frappe.utils import now_datetime, today
 
 from frappe_whatsapp.utils.security import normalize_phone, require_roles
+from frappe_whatsapp.utils.contact_name import display_names
 from frappe_whatsapp.utils.conversation import close_expired_conversations
 
 ROLES = ("System Manager", "WhatsApp Manager", "WhatsApp Agent")
@@ -40,6 +41,9 @@ def get_boot_data():
         order_by="last_message_at desc",
         limit=50,
     )
+    names = display_names([c.phone_number for c in conversations])
+    for c in conversations:
+        c["display_name"] = names.get(c.phone_number) or c.customer_name
     today_start = f"{today()} 00:00:00"
     kpis = {
         "open_conversations": frappe.db.count("WhatsApp Conversation", {"status": ["in", ["Open", "Pending"]]}),
@@ -75,7 +79,9 @@ def get_conversation(conversation):
         frappe.db.set_value("WhatsApp Conversation", conv.name, "unread_count", 0, update_modified=False)
     close_expired_conversations()
     conv.reload()
-    return {"conversation": conv.as_dict(), "messages": messages}
+    data = conv.as_dict()
+    data["display_name"] = display_names([conv.phone_number]).get(conv.phone_number) or conv.customer_name
+    return {"conversation": data, "messages": messages}
 
 
 @frappe.whitelist(methods=["POST"])
