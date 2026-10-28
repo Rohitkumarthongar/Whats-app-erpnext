@@ -1,0 +1,148 @@
+{
+ "actions": [],
+ "creation": "2026-10-19 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "reference_doctype",
+  "event",
+  "workflow_state",
+  "condition",
+  "column_break_when",
+  "whatsapp_template",
+  "print_format",
+  "send_system_notification",
+  "send_email",
+  "subject",
+  "recipients_section",
+  "designations",
+  "roles",
+  "column_break_recipients",
+  "mobile_field",
+  "notify_owner"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "default": "Submit",
+   "fieldname": "event",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Send On",
+   "options": "New\nSubmit\nCancel\nWorkflow State",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.event=='Workflow State'",
+   "description": "Send when the document moves into this workflow state, e.g. Pending.",
+   "fieldname": "workflow_state",
+   "fieldtype": "Data",
+   "label": "Workflow State",
+   "mandatory_depends_on": "eval:doc.event=='Workflow State'"
+  },
+  {
+   "description": "Optional Python expression, e.g. doc.grand_total > 100000",
+   "fieldname": "condition",
+   "fieldtype": "Small Text",
+   "label": "Condition"
+  },
+  {
+   "fieldname": "column_break_when",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Approved WhatsApp template. Its {{variables}} are read from the document fields with the same name.",
+   "fieldname": "whatsapp_template",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "WhatsApp Template"
+  },
+  {
+   "fieldname": "print_format",
+   "fieldtype": "Link",
+   "label": "Attach PDF Print Format",
+   "options": "Print Format",
+   "description": "Used when the WhatsApp template has a Document header: the document is attached as a PDF in this print format. Empty uses the document's default."
+  },
+  {
+   "default": "1",
+   "fieldname": "send_system_notification",
+   "fieldtype": "Check",
+   "label": "Send System Notification"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_email",
+   "fieldtype": "Check",
+   "label": "Send Email"
+  },
+  {
+   "description": "Title for the system notification / email. Jinja allowed, e.g. Sales Order {{ doc.name }} submitted. Default: <Document> <name> <event>.",
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject"
+  },
+  {
+   "fieldname": "recipients_section",
+   "fieldtype": "Section Break",
+   "label": "Recipients"
+  },
+  {
+   "description": "Employee designations, one per line. Active employees with these designations receive it (WhatsApp on their mobile, email/system on their user).",
+   "fieldname": "designations",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Designations"
+  },
+  {
+   "description": "Roles, one per line. Enabled users with these roles receive it.",
+   "fieldname": "roles",
+   "fieldtype": "Small Text",
+   "label": "Roles"
+  },
+  {
+   "fieldname": "column_break_recipients",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Field on the document holding a mobile number to message, e.g. mobile_no on Lead (customer).",
+   "fieldname": "mobile_field",
+   "fieldtype": "Data",
+   "label": "Document Mobile Field"
+  },
+  {
+   "default": "0",
+   "fieldname": "notify_owner",
+   "fieldtype": "Check",
+   "label": "Also Notify Document Owner"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-19 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Whatsapp",
+ "name": "WhatsApp Flow Notification",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

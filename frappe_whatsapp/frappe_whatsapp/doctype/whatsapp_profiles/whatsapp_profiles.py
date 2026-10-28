@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe_whatsapp.utils import format_number
+from frappe_whatsapp.utils.contact_name import display_name
 
 class WhatsAppProfiles(Document):
     def validate(self):
@@ -15,4 +16,5 @@ class WhatsAppProfiles(Document):
             self.number = format_number(self.number)
 
     def set_title(self):
-        self.title = " - ".join(p for p in (self.profile_name, self.number) if p) or "Unnamed Profile"
+        name = (display_name(self.number) if self.number else None) or self.profile_name
+        self.title = " - ".join(p for p in (name, self.number) if p) or "Unnamed Profile"

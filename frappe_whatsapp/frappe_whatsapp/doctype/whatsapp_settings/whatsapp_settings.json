@@ -52,7 +52,11 @@
   "enable_audit_log",
   "message_retention_days",
   "mask_phone_numbers",
-  "allow_agents_export"
+  "allow_agents_export",
+  "flow_notifications_tab",
+  "enable_flow_notifications",
+  "apply_whatsapp_approval_replies",
+  "flow_notifications"
  ],
  "fields": [
   {
@@ -320,6 +324,31 @@
    "fieldname": "allow_agents_export",
    "fieldtype": "Check",
    "label": "Allow Agents to Export Conversations"
+  },
+  {
+   "fieldname": "flow_notifications_tab",
+   "fieldtype": "Tab Break",
+   "label": "Flow Notifications"
+  },
+  {
+   "default": "0",
+   "description": "One row per step of a business flow. Each row sends a WhatsApp template (optionally with the PDF attached) and/or a system notification to the listed designations, roles and document mobile field when the document reaches the chosen event.",
+   "fieldname": "enable_flow_notifications",
+   "fieldtype": "Check",
+   "label": "Enable Flow Notifications"
+  },
+  {
+   "default": "1",
+   "description": "When an approver taps a quick-reply button on a workflow template, apply that workflow action to the document as the approver's user.",
+   "fieldname": "apply_whatsapp_approval_replies",
+   "fieldtype": "Check",
+   "label": "Apply Approve / Reject replies from WhatsApp"
+  },
+  {
+   "fieldname": "flow_notifications",
+   "fieldtype": "Table",
+   "label": "Flow Notifications",
+   "options": "WhatsApp Flow Notification"
   }
  ],
  "grid_page_length": 50,
