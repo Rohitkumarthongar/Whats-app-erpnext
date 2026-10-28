@@ -10,19 +10,42 @@ frappe.pages["whatsapp-command-center"].on_page_load = function (wrapper) {
 const STATUS_OPTIONS = ["Open", "Pending", "Resolved", "Closed"];
 const PRIORITY_OPTIONS = ["Low", "Medium", "High", "Urgent"];
 const MODULE_LINKS = [
-  { label: "Accounts", doctype: "WhatsApp Account" },
-  { label: "Automation Rules", doctype: "WhatsApp Automation Rule" },
-  { label: "Campaigns", doctype: "Bulk WhatsApp Message" },
-  { label: "Consent Log", doctype: "WhatsApp Consent" },
-  { label: "Conversations", doctype: "WhatsApp Conversation" },
-  { label: "Flows", doctype: "WhatsApp Flow" },
-  { label: "Messages", doctype: "WhatsApp Message" },
-  { label: "Notification Log", doctype: "WhatsApp Notification Log" },
-  { label: "Notifications", doctype: "WhatsApp Notification" },
-  { label: "Profiles", doctype: "WhatsApp Profiles" },
-  { label: "Recipient Lists", doctype: "WhatsApp Recipient List" },
-  { label: "Templates", doctype: "WhatsApp Templates" },
+  { icon: "account", label: "Accounts", doctype: "WhatsApp Account" },
+  { icon: "rules", label: "Automation Rules", doctype: "WhatsApp Automation Rule" },
+  { icon: "campaigns", label: "Campaigns", doctype: "Bulk WhatsApp Message" },
+  { icon: "consent", label: "Consent Log", doctype: "WhatsApp Consent" },
+  { icon: "conversation", label: "Conversations", doctype: "WhatsApp Conversation" },
+  { icon: "flow", label: "Flows", doctype: "WhatsApp Flow" },
+  { icon: "message", label: "Messages", doctype: "WhatsApp Message" },
+  { icon: "log", label: "Notification Log", doctype: "WhatsApp Notification Log" },
+  { icon: "bell", label: "Notifications", doctype: "WhatsApp Notification" },
+  { icon: "profiles", label: "Profiles", doctype: "WhatsApp Profiles" },
+  { icon: "list", label: "Recipient Lists", doctype: "WhatsApp Recipient List" },
+  { icon: "template", label: "Templates", doctype: "WhatsApp Templates" },
 ].sort((a, b) => a.label.localeCompare(b.label));
+// Feather-style line icons (24x24 paths) for the side menu, so it stays usable when collapsed.
+const NAV_ICONS = {
+  dashboard: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  inbox: '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  campaigns: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  automation: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  account: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  rules: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  consent: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  conversation: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  flow: '<line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+  message: '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 3.9 11.5 8.5 8.5 0 0 1 12.4 3 8.4 8.4 0 0 1 21 11.5z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/>',
+  log: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
+  bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  profiles: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  list: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  template: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+};
+const nav_icon = (key) =>
+  `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" aria-hidden="true">${NAV_ICONS[key] || NAV_ICONS.list}</svg>`;
+const nav_button = (attrs, label, icon) =>
+  `<button ${attrs} title="${esc(label)}" aria-label="${esc(label)}"><span class="wa-nav-inner" style="display:flex;align-items:center;gap:12px">${nav_icon(icon)}<span class="wa-nav-label">${esc(label)}</span></span></button>`;
 const esc = (value) => frappe.utils.escape_html(value == null ? "" : String(value));
 
 class WhatsAppCommandCenter {
@@ -38,14 +61,13 @@ class WhatsAppCommandCenter {
     $(this.page.body).html(`<div class="wa-center">
       <nav class="wa-sidebar">
         <div class="wa-brand" role="button" tabindex="0" style="display:flex;align-items:center;gap:10px;padding:6px 18px 14px;cursor:pointer;user-select:none" title="${__("Collapse / expand menu")}">${this.brand_html()}<span class="wa-brand-name" style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(frappe.boot.sysdefaults?.company || "WhatsApp")}</span></div>
-        <button data-view="dashboard" class="active"><span>${__("Dashboard")}</span></button>
-        <button data-view="inbox"><span>${__("Inbox")}</span></button>
-        <button data-view="campaigns" class="wa-nav-optional" data-flag="enable_campaigns"><span>${__("Campaigns")}</span></button>
-        <button data-view="automation" class="wa-nav-optional" data-flag="enable_automation"><span>${__("Automation")}</span></button>
-        <button data-view="settings"><span>${__("Settings")}</span></button>
-        ${MODULE_LINKS.map(
-          (m) =>
-            `<button class="wa-sidebar-link" data-doctype="${esc(m.doctype)}" ${m.single ? 'data-single="1"' : ""}><span>${esc(m.label)}</span></button>`,
+        ${nav_button('data-view="dashboard" class="active"', __("Dashboard"), "dashboard")}
+        ${nav_button('data-view="inbox"', __("Inbox"), "inbox")}
+        ${nav_button('data-view="campaigns" class="wa-nav-optional" data-flag="enable_campaigns"', __("Campaigns"), "campaigns")}
+        ${nav_button('data-view="automation" class="wa-nav-optional" data-flag="enable_automation"', __("Automation"), "automation")}
+        ${nav_button('data-view="settings"', __("Settings"), "settings")}
+        ${MODULE_LINKS.map((m) =>
+          nav_button(`class="wa-sidebar-link" data-doctype="${esc(m.doctype)}" ${m.single ? 'data-single="1"' : ""}`, __(m.label), m.icon),
         ).join("")}
       </nav>
       <div class="wa-main"><div class="wa-content"><div class="wa-loading">${__("Loading WhatsApp workspace...")}</div></div></div></div>`);
@@ -89,9 +111,11 @@ class WhatsAppCommandCenter {
     this.page.body.find(".wa-center").toggleClass("wa-collapsed", !!collapsed);
     const $nav = this.page.body.find(".wa-sidebar");
     $nav.css({ width: collapsed ? "68px" : "", overflow: collapsed ? "hidden" : "" });
-    $nav.children("button").css("display", collapsed ? "none" : "");
-    if (!collapsed) this.apply_optional_nav();
-    $nav.find(".wa-brand-name").toggle(!collapsed);
+    // labels go, icons stay (each button keeps its tooltip); the logo is the toggle
+    $nav.find(".wa-nav-label, .wa-brand-name").css("display", collapsed ? "none" : "");
+    $nav.children("button").css("padding", collapsed ? "11px 0" : "");
+    $nav.find(".wa-nav-inner").css("justify-content", collapsed ? "center" : "");
+    $nav.children(".wa-brand").css({ padding: collapsed ? "6px 0 14px" : "6px 18px 14px", "justify-content": collapsed ? "center" : "" });
     try {
       localStorage.setItem("wa_sidebar_collapsed", collapsed ? "1" : "0");
     } catch (e) {}
