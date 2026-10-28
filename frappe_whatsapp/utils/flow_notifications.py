@@ -58,8 +58,8 @@ def validate_flow_notifications(rows):
 			missing = [v for v in _template_variables(body) if not v.isdigit() and v != "name" and not meta.has_field(v) and v not in ("owner", "modified_by", "creation", "modified")]
 			if missing:
 				frappe.throw(_("{0}: template variables {1} are not fields of {2}.").format(label, ", ".join(missing), row.reference_doctype))
-		if cint(row.enabled) and not (row.designations or row.roles or row.mobile_field or row.notify_owner):
-			frappe.throw(_("{0}: add at least one recipient (designation, role, mobile field or owner).").format(label))
+		if cint(row.enabled) and not (row.employee or row.designations or row.roles or row.mobile_field or row.notify_owner):
+			frappe.throw(_("{0}: add at least one recipient (employee, designation, role, mobile field or owner).").format(label))
 
 
 def clear_flow_notification_cache():
@@ -164,7 +164,10 @@ def _subject(doc, rule):
 
 
 def resolve_recipients(doc, rule):
-	"""[{user, phone}] from designations, roles, document mobile field and owner."""
+	"""[{user, phone}] from the chosen employee alone, else designations, roles, document mobile field and owner."""
+	if rule.get("employee"):
+		user, phone = frappe.db.get_value("Employee", rule.employee, ["user_id", "cell_number"]) or (None, None)
+		return [{"user": user, "phone": normalize_phone(phone)}]
 	out = []
 	designations = _lines(rule.designations)
 	if designations:

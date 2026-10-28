@@ -92,6 +92,18 @@ class TestFlowNotifications(FrappeTestCase):
 		self.assertTrue({"919000000001", "919000000002", "919000000003", "919000000004"} <= phones)
 		self.assertTrue({acct, "flow.role@example.com"} <= users)
 
+	def test_chosen_employee_receives_alone(self):
+		des = _designation("Flow Test Accountant")
+		user = _user("flow.only@example.com")
+		emp = _employee("Only", des, user, "9000000011")
+		_employee("Other", des, None, "9000000012")
+		doc = frappe._dict(owner="flow.only@example.com", mobile_no="9000000014")
+		rule = frappe._dict(employee=emp.name, designations=des, roles="Accounts Manager", mobile_field="mobile_no", notify_owner=1)
+		self.assertEqual(fn.resolve_recipients(doc, rule), [{"user": user, "phone": "919000000011"}])
+		# an enabled row whose only recipient is the employee is valid
+		row = frappe._dict(idx=1, reference_doctype="Sales Order", event="Submit", enabled=1, employee=emp.name)
+		fn.validate_flow_notifications([row])
+
 	def test_named_payload_uses_field_names(self):
 		name = _template("flow_test_so", "Sales Order {{name}} for {{customer_name}} total {{grand_total}} by {{owner}}.")
 		tpl = frappe.get_doc("WhatsApp Templates", name)

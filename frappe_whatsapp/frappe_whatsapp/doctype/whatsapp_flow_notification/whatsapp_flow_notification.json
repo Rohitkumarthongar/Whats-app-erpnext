@@ -17,6 +17,7 @@
   "send_email",
   "subject",
   "recipients_section",
+  "employee",
   "designations",
   "roles",
   "column_break_recipients",
@@ -104,17 +105,27 @@
    "label": "Recipients"
   },
   {
+   "description": "If set, only this employee is notified (WhatsApp on their mobile number, system notification/email on their user). Designations, roles, mobile field and owner are ignored.",
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
    "description": "Employee designations, one per line. Active employees with these designations receive it (WhatsApp on their mobile, email/system on their user).",
    "fieldname": "designations",
    "fieldtype": "Small Text",
    "in_list_view": 1,
-   "label": "Designations"
+   "label": "Designations",
+   "depends_on": "eval:!doc.employee"
   },
   {
    "description": "Roles, one per line. Enabled users with these roles receive it.",
    "fieldname": "roles",
    "fieldtype": "Small Text",
-   "label": "Roles"
+   "label": "Roles",
+   "depends_on": "eval:!doc.employee"
   },
   {
    "fieldname": "column_break_recipients",
@@ -124,13 +135,15 @@
    "description": "Field on the document holding a mobile number to message, e.g. mobile_no on Lead (customer).",
    "fieldname": "mobile_field",
    "fieldtype": "Data",
-   "label": "Document Mobile Field"
+   "label": "Document Mobile Field",
+   "depends_on": "eval:!doc.employee"
   },
   {
    "default": "0",
    "fieldname": "notify_owner",
    "fieldtype": "Check",
-   "label": "Also Notify Document Owner"
+   "label": "Also Notify Document Owner",
+   "depends_on": "eval:!doc.employee"
   }
  ],
  "index_web_pages_for_search": 0,
