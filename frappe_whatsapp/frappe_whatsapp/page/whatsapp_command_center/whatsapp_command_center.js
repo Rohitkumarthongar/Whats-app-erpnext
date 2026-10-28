@@ -37,6 +37,7 @@ class WhatsAppCommandCenter {
   make() {
     $(this.page.body).html(`<div class="wa-center">
       <nav class="wa-sidebar">
+        <div class="wa-brand" role="button" tabindex="0" title="${__("Collapse / expand menu")}">${this.brand_html()}<span class="wa-brand-name">${esc(frappe.boot.sysdefaults?.company || "WhatsApp")}</span></div>
         <button data-view="dashboard" class="active"><span>${__("Dashboard")}</span></button>
         <button data-view="inbox"><span>${__("Inbox")}</span></button>
         <button data-view="campaigns" class="wa-nav-optional" data-flag="enable_campaigns"><span>${__("Campaigns")}</span></button>
@@ -48,6 +49,12 @@ class WhatsAppCommandCenter {
         ).join("")}
       </nav>
       <div class="wa-main"><div class="wa-content"><div class="wa-loading">${__("Loading WhatsApp workspace...")}</div></div></div></div>`);
+    this.set_collapsed(this.is_collapsed());
+    this.page.body.on("click keydown", ".wa-brand", (e) => {
+      if (e.type === "keydown" && !["Enter", " "].includes(e.key)) return;
+      e.preventDefault();
+      this.set_collapsed(!this.page.body.find(".wa-center").hasClass("wa-collapsed"));
+    });
     this.page.body.on("click", ".wa-sidebar button[data-view]", (e) => {
       this.activate_nav($(e.currentTarget).data("view"));
       this.render($(e.currentTarget).data("view"));
@@ -58,6 +65,25 @@ class WhatsAppCommandCenter {
       if ($el.data("single")) frappe.set_route("Form", doctype);
       else frappe.set_route("List", doctype);
     });
+  }
+  brand_html() {
+    const logo = frappe.boot.app_logo_url || (frappe.boot.website_settings || {}).app_logo;
+    if (logo) return `<img class="wa-brand-logo" src="${esc(logo)}" alt="">`;
+    const company = frappe.boot.sysdefaults?.company || "W";
+    return `<span class="wa-brand-logo wa-brand-initial">${esc(company[0].toUpperCase())}</span>`;
+  }
+  is_collapsed() {
+    try {
+      return localStorage.getItem("wa_sidebar_collapsed") === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+  set_collapsed(collapsed) {
+    this.page.body.find(".wa-center").toggleClass("wa-collapsed", !!collapsed);
+    try {
+      localStorage.setItem("wa_sidebar_collapsed", collapsed ? "1" : "0");
+    } catch (e) {}
   }
   activate_nav(view) {
     this.page.body.find(".wa-sidebar button[data-view]").removeClass("active");
