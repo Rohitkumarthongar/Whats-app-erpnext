@@ -37,7 +37,7 @@ class WhatsAppCommandCenter {
   make() {
     $(this.page.body).html(`<div class="wa-center">
       <nav class="wa-sidebar">
-        <div class="wa-brand" role="button" tabindex="0" title="${__("Collapse / expand menu")}">${this.brand_html()}<span class="wa-brand-name">${esc(frappe.boot.sysdefaults?.company || "WhatsApp")}</span></div>
+        <div class="wa-brand" role="button" tabindex="0" style="display:flex;align-items:center;gap:10px;padding:6px 18px 14px;cursor:pointer;user-select:none" title="${__("Collapse / expand menu")}">${this.brand_html()}<span class="wa-brand-name" style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(frappe.boot.sysdefaults?.company || "WhatsApp")}</span></div>
         <button data-view="dashboard" class="active"><span>${__("Dashboard")}</span></button>
         <button data-view="inbox"><span>${__("Inbox")}</span></button>
         <button data-view="campaigns" class="wa-nav-optional" data-flag="enable_campaigns"><span>${__("Campaigns")}</span></button>
@@ -68,9 +68,15 @@ class WhatsAppCommandCenter {
   }
   brand_html() {
     const logo = frappe.boot.app_logo_url || (frappe.boot.website_settings || {}).app_logo;
-    if (logo) return `<img class="wa-brand-logo" src="${esc(logo)}" alt="">`;
+    if (logo) return `<img class="wa-brand-logo" src="${esc(logo)}" alt="" style="width:32px;height:32px;max-width:32px;object-fit:contain;flex-shrink:0">`;
     const company = frappe.boot.sysdefaults?.company || "W";
-    return `<span class="wa-brand-logo wa-brand-initial">${esc(company[0].toUpperCase())}</span>`;
+    return `<span class="wa-brand-logo wa-brand-initial" style="width:32px;height:32px;display:grid;place-items:center;border-radius:8px;background:#128c7e;color:#fff;font-weight:700;flex-shrink:0">${esc(company[0].toUpperCase())}</span>`;
+  }
+  apply_optional_nav() {
+    this.page.body.find(".wa-nav-optional").each((_, el) => {
+      const flag = $(el).data("flag");
+      $(el).toggle(!!((this.data || {}).settings || {})[flag]);
+    });
   }
   is_collapsed() {
     try {
@@ -81,6 +87,11 @@ class WhatsAppCommandCenter {
   }
   set_collapsed(collapsed) {
     this.page.body.find(".wa-center").toggleClass("wa-collapsed", !!collapsed);
+    const $nav = this.page.body.find(".wa-sidebar");
+    $nav.css({ width: collapsed ? "68px" : "", overflow: collapsed ? "hidden" : "" });
+    $nav.children("button").css("display", collapsed ? "none" : "");
+    if (!collapsed) this.apply_optional_nav();
+    $nav.find(".wa-brand-name").toggle(!collapsed);
     try {
       localStorage.setItem("wa_sidebar_collapsed", collapsed ? "1" : "0");
     } catch (e) {}
@@ -96,10 +107,7 @@ class WhatsAppCommandCenter {
     this.data = r.message || {};
     // Campaigns / Automation are advanced surfaces most teams don't need in
     // the main nav — show them only when turned on in WhatsApp Settings.
-    this.page.body.find(".wa-nav-optional").each((_, el) => {
-      const flag = $(el).data("flag");
-      $(el).toggle(!!(this.data.settings || {})[flag]);
-    });
+    this.apply_optional_nav();
     this.render(this.current_view || "dashboard");
   }
   render(view) {
