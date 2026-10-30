@@ -171,7 +171,13 @@ def get_whatsapp_account(phone_id=None, account_type='incoming'):
 
     account_field_type = 'is_default_incoming' if account_type =='incoming' else 'is_default_outgoing' 
     default_account_name = frappe.db.get_value('WhatsApp Account', {account_field_type: 1}, 'name')
-    if default_account_name:
+    if not default_account_name:
+        # WhatsApp Settings names the default account too; honour it when the account's own flag was never ticked
+        settings_field = 'default_incoming_account' if account_type == 'incoming' else 'default_outgoing_account'
+        default_account_name = frappe.db.get_single_value('WhatsApp Settings', settings_field)
+        if default_account_name and frappe.db.get_value('WhatsApp Account', default_account_name, 'status') != 'Active':
+            default_account_name = None
+    if default_account_name and frappe.db.exists('WhatsApp Account', default_account_name):
         return frappe.get_doc("WhatsApp Account", default_account_name)
 
     return None

@@ -85,7 +85,7 @@ button.wa-new-message:hover{background:#0f6f63}
 .wa-brand-initial{display:grid;place-items:center;background:#128c7e;color:#fff;font-weight:700}
 .wa-brand-name{font-weight:600;font-size:13px;color:#3f4a56;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wa-center.wa-collapsed .wa-sidebar{width:68px;overflow:hidden}
-.wa-center.wa-collapsed .wa-sidebar>button,.wa-center.wa-collapsed .wa-brand-name{display:none}
+.wa-center.wa-collapsed .wa-nav-label,.wa-center.wa-collapsed .wa-brand-name{display:none}.wa-center.wa-collapsed .wa-sidebar button{padding:11px 0}.wa-center.wa-collapsed .wa-nav-inner,.wa-center.wa-collapsed .wa-brand{justify-content:center}
 .wa-center.wa-collapsed .wa-brand{padding:6px 18px 14px;border-bottom:0}
 @media(prefers-reduced-motion:reduce){.wa-sidebar{transition:none}}
-@media(max-width:600px){.wa-brand{padding:4px 10px;margin:0;border-bottom:0}.wa-brand-name{display:none}.wa-center.wa-collapsed .wa-sidebar{width:auto;overflow-x:auto}.wa-center.wa-collapsed .wa-sidebar>button{display:none}}
+@media(max-width:600px){.wa-brand{padding:4px 10px;margin:0;border-bottom:0}.wa-brand-name{display:none}.wa-center.wa-collapsed .wa-sidebar{width:auto}.wa-sidebar button{padding:10px 12px}.wa-nav-label{display:none}.wa-sidebar button .wa-nav-inner{justify-content:center}}

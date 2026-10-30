@@ -209,9 +209,26 @@ class WhatsAppMessage(Document):
             },
         }
 
+        from frappe_whatsapp.utils import template_params
+
         parameters = []
         template_parameters = []
-        if template.sample_values:
+        variables = template_params.body_variables(template)
+        sent_by_hand = self.body_param is None and not self.flags.custom_ref_doc
+        if variables and sent_by_hand and template_params.is_named(variables):
+            # named variables: the template says what it needs, so no field list has to be typed
+            ref_doc = (
+                frappe.get_doc(self.reference_doctype, self.reference_name)
+                if self.reference_doctype and self.reference_name and frappe.db.exists(self.reference_doctype, self.reference_name)
+                else None
+            )
+            parameters, template_parameters = template_params.named_parameters(
+                variables, ref_doc, self.to, template.name
+            )
+            self.template_parameters = json.dumps(template_parameters)
+        elif variables and sent_by_hand and not (template.field_names or template.sample_values):
+            template_params.numbered_fields_error(template.name, variables)
+        elif template.sample_values:
             field_names = template.field_names.split(",") if template.field_names else template.sample_values.split(",")
 
             if self.body_param is not None:
@@ -370,17 +387,26 @@ class WhatsAppMessage(Document):
             self.message_id = response["messages"][0]["id"]
 
         except Exception as e:
-            res = frappe.flags.integration_request.json().get("error", {})
+            request = getattr(frappe.flags, "integration_request", None)
+            if request is None:
+                # no answer from Meta at all (network, DNS, timeout)
+                frappe.throw(msg=_("Could not reach WhatsApp. Check the connection and try again."), title=_("WhatsApp not reachable"))
+            res = request.json().get("error", {})
             error_message = res.get("Error", res.get("message"))
             frappe.get_doc(
                 {
                     "doctype": "WhatsApp Notification Log",
                     "template": "Text Message",
-                    "meta_data": frappe.flags.integration_request.json(),
+                    "meta_data": request.json(),
                 }
             ).insert(ignore_permissions=True)
 
-            frappe.throw(msg=error_message, title=res.get("error_user_title", "Error"))
+            from frappe_whatsapp.utils.template_params import friendly_error
+
+            explanation, details = friendly_error(res, data, self.template if self.message_type == "Template" else None)
+            if details and details != explanation:
+                explanation = f"{explanation}<br><small>{_('Meta says')}: {frappe.utils.escape_html(details)}</small>"
+            frappe.throw(msg=explanation, title=res.get("error_user_title") or _("WhatsApp could not send"))
 
     def format_number(self, number):
         """Format number."""
