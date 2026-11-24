@@ -51,26 +51,65 @@ def process_webhook():
     value = changes[0].get("value") or {}
     phone_id = (value.get("metadata") or {}).get("phone_number_id")
     business_id = data.get("entry", [{}])[0].get("id")
-    account = get_whatsapp_account(phone_id) if phone_id else None
-    if not account and business_id:
-        name = frappe.db.get_value("WhatsApp Account", {"business_id": business_id, "status": "Active"}, "name")
-        account = frappe.get_doc("WhatsApp Account", name) if name else None
-    if not account:
-        frappe.throw(_("Unable to resolve WhatsApp Account"), frappe.AuthenticationError)
-    assert_meta_signature(account, raw)
+    try:
+        account = get_whatsapp_account(phone_id) if phone_id else None
+        if not account and business_id:
+            name = frappe.db.get_value("WhatsApp Account", {"business_id": business_id, "status": "Active"}, "name")
+            account = frappe.get_doc("WhatsApp Account", name) if name else None
+        if not account:
+            frappe.throw(_("Unable to resolve WhatsApp Account"), frappe.AuthenticationError)
+        assert_meta_signature(account, raw)
+    except Exception as exc:
+        # Validation / authentication errors are not written to the Error Log by Frappe, so a
+        # rejected webhook used to leave no trace at all. Record it (throttled), then reject as before.
+        _log_rejected(str(exc), raw)
+        raise
 
     _log_payload(data, account.name)
+    # Each item is processed on its own savepoint: one failing message must not roll back the
+    # payload log or the other messages, and the failure is kept in the Error Log.
     for change in changes:
         field = change.get("field")
         value = change.get("value") or {}
         if field == "messages":
             for message in value.get("messages") or []:
-                _ingest_message(message, value, account)
+                _guarded(f"incoming message {message.get('id')}", _ingest_message, message, value, account)
             for status in value.get("statuses") or []:
-                _update_message_status(status)
+                _guarded(f"status update {status.get('id')}", _update_message_status, status)
         elif field == "message_template_status_update":
-            _update_template_status(value, account.name)
+            _guarded("template status update", _update_template_status, value, account.name)
     return Response("EVENT_RECEIVED", status=200)
+
+
+def _guarded(label, func, *args):
+    """Run one webhook step; on failure undo just that step, log it, and carry on.
+
+    Without this an exception anywhere while saving an incoming message (conversation sync,
+    profile creation, ...) rolled back the whole request - the logged payload and the reply
+    itself - and, being a validation-type error, left nothing in the Error Log.
+    """
+    savepoint = "whatsapp_webhook_step"
+    frappe.db.savepoint(savepoint)
+    try:
+        return func(*args)
+    except Exception:
+        frappe.db.rollback(save_point=savepoint)
+        frappe.log_error(title="WhatsApp webhook step failed", message=f"{label}\n\n{frappe.get_traceback()}")
+        return None
+
+
+def _log_rejected(reason, raw):
+    """Keep a (throttled) record of a webhook call that was refused before processing."""
+    key = "whatsapp_webhook_rejected:" + (reason or "")[:80]
+    if frappe.cache.get_value(key):
+        return
+    frappe.cache.set_value(key, 1, expires_in_sec=300)
+    has_signature = bool(frappe.request.headers.get("X-Hub-Signature-256")) if frappe.request else False
+    frappe.log_error(
+        title="WhatsApp webhook rejected",
+        message=f"{reason}\nX-Hub-Signature-256 present: {has_signature}\nbody starts: {raw[:400]!r}",
+    )
+    frappe.db.commit()  # nosemgrep: frappe-manual-commit -- the request is about to be rejected, which would roll the log back
 
 
 def _log_payload(data, account):
