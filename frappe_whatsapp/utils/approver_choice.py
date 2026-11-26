@@ -139,12 +139,12 @@ def narrow_recipients(doc, rule, recipients):
 		approver = chosen_approver(doc.doctype, doc.name, get_doc_workflow_state(doc))
 		if not approver:
 			return recipients
-		roles = _approver_roles(doc)
 		kept = []
 		for r in recipients:
-			user = r.get("user")
-			if user and user != approver and roles & set(frappe.get_roles(user)):
-				continue  # another approver
+			# anyone who is on the rule only because of a role or designation (not the owner or a mobile field of the document)
+			# is a possible approver, whether or not the workflow itself would let them approve: only the chosen one stays
+			if r.get("via") == "group" and r.get("user") != approver:
+				continue
 			kept.append(r)
 		if not any(r.get("user") == approver for r in kept) and (rule.get("roles") or rule.get("designations")):
 			from frappe_whatsapp.utils.flow_notifications import _employee_phone

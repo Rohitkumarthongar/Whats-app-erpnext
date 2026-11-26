@@ -153,15 +153,19 @@ class TestNarrowRecipients(unittest.TestCase):
 			patch.object(fn, "_employee_phone", return_value="9000000009"), patch.object(ac.frappe.db, "get_value", return_value=None):
 			return ac.narrow_recipients(d, frappe._dict(rule), recipients)
 
-	def test_the_other_approvers_are_dropped_and_the_rest_kept(self):
+	def test_everyone_added_by_a_role_or_designation_is_dropped_and_the_rest_kept(self):
+		g = {"via": "group"}
 		out = self.narrow(
-			[{"user": "a@x.com", "phone": "1"}, {"user": "b@x.com", "phone": "2"}, {"user": "maker@x.com", "phone": "3"}, {"user": None, "phone": "4"}],
+			[{"user": "a@x.com", "phone": "1", **g}, {"user": "b@x.com", "phone": "2", **g}, {"user": "maker@x.com", "phone": "3", **g},
+			 {"user": None, "phone": "5", **g},  # an employee with no user, found by designation
+			 {"user": "owner@x.com", "phone": "6"}, {"user": None, "phone": "4"}],
 			{"roles": "Approver"},
 		)
-		self.assertEqual([r["user"] for r in out], ["b@x.com", "maker@x.com", None])  # owner and the mobile-field number stay
+		self.assertEqual([r["user"] for r in out], ["b@x.com", "owner@x.com", None])  # owner and the mobile-field number stay
+		self.assertEqual([r["phone"] for r in out], ["2", "6", "4"])
 
 	def test_the_chosen_approver_is_added_when_the_rule_names_roles_but_they_were_missed(self):
-		out = self.narrow([{"user": "a@x.com", "phone": "1"}], {"designations": "Manager"})
+		out = self.narrow([{"user": "a@x.com", "phone": "1", "via": "group"}], {"designations": "Manager"})
 		self.assertEqual([r["user"] for r in out], ["b@x.com"])
 		self.assertEqual(out[0]["phone"], "9000000009")
 
