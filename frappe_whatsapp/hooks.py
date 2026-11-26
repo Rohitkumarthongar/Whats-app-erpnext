@@ -7,12 +7,21 @@ app_description = "WhatsApp integration for frappe"
 app_email = "rohitkumarsoni713@gmail.com"
 app_license = "MIT"
 
+# Send for approval to one chosen approver: narrows Frappe's approval email (web and worker processes alike).
+# Never allowed to stop the app loading: without it everyone with the approver role is notified, as before.
+try:
+    from frappe_whatsapp.utils.approver_choice import apply_core_patch
+
+    apply_core_patch()
+except Exception:
+    pass
+
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/frappe_whatsapp/css/whatsapp_command_center.css"
-app_include_js = "/assets/frappe_whatsapp/js/frappe_whatsapp.js"
+app_include_css = ["/assets/frappe_whatsapp/css/whatsapp_command_center.css", "/assets/frappe_whatsapp/css/workflow_approver.css"]
+app_include_js = ["/assets/frappe_whatsapp/js/frappe_whatsapp.js", "/assets/frappe_whatsapp/js/workflow_approver.js"]
 # app_include_js = ["frappe_whatsapp.js"]
 
 # include js, css files in header of web template
@@ -126,6 +135,7 @@ scheduler_events = {
         "frappe_whatsapp.utils.trigger_whatsapp_notifications_hourly_long"
     ],
     "daily": [
+        "frappe_whatsapp.utils.approver_choice.clear_old_choices",
         "frappe_whatsapp.utils.trigger_whatsapp_notifications_daily",
         "frappe_whatsapp.frappe_whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_notifications",
     ],

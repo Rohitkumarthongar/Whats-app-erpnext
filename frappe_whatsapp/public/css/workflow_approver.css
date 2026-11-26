@@ -1,0 +1,21 @@
+.mfa-intro { margin: 0 0 12px; }
+.mfa-search { margin-bottom: 10px; }
+.mfa-list { display: grid; gap: 8px; max-height: 46vh; overflow-y: auto; padding: 2px; }
+.mfa-option { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; margin: 0; padding: 10px 12px;
+	border: 1px solid var(--border-color); border-radius: var(--border-radius-md, 8px); cursor: pointer; background: var(--card-bg); font-weight: 400; }
+.mfa-option:hover { background: var(--control-bg); }
+.mfa-option.is-chosen { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); background: var(--control-bg); }
+.mfa-option input { margin: 0; }
+.mfa-option:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
+.mfa-who { display: grid; gap: 2px; min-width: 0; }
+.mfa-name { font-weight: 600; overflow-wrap: anywhere; }
+.mfa-meta { color: var(--text-muted); font-size: var(--text-sm); overflow-wrap: anywhere; }
+.mfa-roles { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.mfa-role { padding: 0 8px; border-radius: 999px; background: var(--control-bg); border: 1px solid var(--border-color); font-size: var(--text-xs, 11px); }
+.mfa-wa { font-size: var(--text-xs, 11px); text-align: right; max-width: 130px; }
+.mfa-wa-yes { color: var(--green-600, #2f855a); }
+.mfa-wa-no { color: var(--text-muted); }
+@media (max-width: 575px) {
+	.mfa-option { grid-template-columns: auto minmax(0, 1fr); }
+	.mfa-wa { grid-column: 2; text-align: left; max-width: none; }
+}

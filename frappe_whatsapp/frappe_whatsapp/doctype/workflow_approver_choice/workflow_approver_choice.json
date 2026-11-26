@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-11-26 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_doctype",
+  "reference_name",
+  "action",
+  "workflow_state",
+  "column_break_a",
+  "approver",
+  "chosen_by",
+  "valid_till"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Document",
+   "options": "reference_doctype",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Data",
+   "label": "Action taken",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Data",
+   "label": "Moves to state",
+   "read_only": 1,
+   "description": "The approver is notified while the document is in this state"
+  },
+  {
+   "fieldname": "column_break_a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Chosen approver",
+   "options": "User",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "chosen_by",
+   "fieldtype": "Link",
+   "label": "Chosen by",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "valid_till",
+   "fieldtype": "Datetime",
+   "label": "Valid till",
+   "read_only": 1,
+   "description": "After this the choice is ignored and the usual approvers are notified"
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-11-26 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Whatsapp",
+ "name": "Workflow Approver Choice",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "delete": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
