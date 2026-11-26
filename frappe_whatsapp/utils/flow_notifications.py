@@ -176,7 +176,7 @@ def resolve_recipients(doc, rule):
 			filters={"status": "Active", "designation": ["in", designations]},
 			fields=["user_id", "cell_number"],
 		):
-			out.append({"user": emp.user_id, "phone": emp.cell_number})
+			out.append({"user": emp.user_id, "phone": emp.cell_number, "via": "group"})
 	roles = _lines(rule.roles)
 	if roles:
 		users = set(
@@ -189,7 +189,7 @@ def resolve_recipients(doc, rule):
 		):
 			if user.name in ("Administrator", "Guest"):
 				continue
-			out.append({"user": user.name, "phone": _employee_phone(user.name) or user.mobile_no})
+			out.append({"user": user.name, "phone": _employee_phone(user.name) or user.mobile_no, "via": "group"})
 	if rule.mobile_field and doc.get(rule.mobile_field):
 		out.append({"user": None, "phone": doc.get(rule.mobile_field)})
 	if cint(rule.notify_owner) and doc.owner not in ("Administrator", "Guest"):
