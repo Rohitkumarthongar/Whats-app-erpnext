@@ -194,6 +194,11 @@ def resolve_recipients(doc, rule):
 		out.append({"user": None, "phone": doc.get(rule.mobile_field)})
 	if cint(rule.notify_owner) and doc.owner not in ("Administrator", "Guest"):
 		out.append({"user": doc.owner, "phone": _employee_phone(doc.owner) or frappe.db.get_value("User", doc.owner, "mobile_no")})
+	if rule.get("event") == "Workflow State":
+		# a document sent for approval to one chosen person: only that approver is told (see approver_choice)
+		from frappe_whatsapp.utils.approver_choice import narrow_recipients
+
+		out = narrow_recipients(doc, rule, out)
 	for r in out:
 		r["phone"] = normalize_phone(r.get("phone"))
 	return out
